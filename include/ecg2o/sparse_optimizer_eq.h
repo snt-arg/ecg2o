@@ -153,9 +153,10 @@ class G2O_CORE_API SparseOptimizerEq : public SparseOptimizer{
     }
   }
 
-
-    public:  
-    double _vInitEqLagrangeMultiplier = 0.0; // Initial value for the Lagrangian vertex
+  public:
+    void setVLagrangianInitial(double vInitial) {_init_eq_lagrange_multiplier = vInitial; }
+  
+    double _init_eq_lagrange_multiplier = 0.0; // Initial value for the Lagrangian vertex
     double epsilon_stop_threshold = 1e-3;
 
     protected: 
@@ -170,7 +171,7 @@ class G2O_CORE_API SparseOptimizerEq : public SparseOptimizer{
       auto vLagrangian = std::make_shared<VertexLagrangeMultiplier<D>>();
       //auto* nu = new VertexLagrangeMultiplier<D>();
       vLagrangian->setId(e->getVertexLagrangeMultiplierId());
-      vLagrangian->setInitialValue(_vInitEqLagrangeMultiplier);
+      vLagrangian->setInitialValue(_init_eq_lagrange_multiplier);
       
     // Add the Nu vertex to the optimizer                
       this->addVertex(vLagrangian.get());

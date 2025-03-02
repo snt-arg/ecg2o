@@ -42,20 +42,25 @@ link_directories(${G2O_LIBRARY_DIRS})
 
 
 # add executable example_gn
-add_executable(example_gn src/example_gn.cpp)
+add_executable(example_gn examples/example_gn.cpp)
 target_link_libraries(example_gn ${G2O_LIBRARIES} Eigen3::Eigen  fmt::fmt) 
 
 
 # add executable example_al
-add_executable(example_al src/example_al.cpp)
+add_executable(example_al examples/example_al.cpp)
 target_link_libraries(example_al ${G2O_LIBRARIES} Eigen3::Eigen  fmt::fmt) 
 
 
 
 # add executable example_al
-add_executable(example_soft src/example_soft.cpp)
+add_executable(example_soft examples/example_soft.cpp)
 target_link_libraries(example_soft ${G2O_LIBRARIES} Eigen3::Eigen  fmt::fmt) 
 
 
 
+
+# add executable oc_test
+add_executable(oc_test oc_tracking/oc_test.cpp)
+target_link_libraries(oc_test ${G2O_LIBRARIES} Eigen3::Eigen  fmt::fmt)
+target_include_directories(oc_test PRIVATE ${CMAKE_SOURCE_DIR}/oc_tracking/include)
 

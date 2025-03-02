@@ -34,7 +34,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 #include <g2o/core/base_unary_edge.h>
 #include <g2o/core/base_binary_edge.h>
 #include <g2o/core/base_vertex.h>
-#include "base_fixed_sized_edge_eq.h"
+#include "ecg2o/base_fixed_sized_edge_eq.h"
 
 
 class VertexXY : public g2o::BaseVertex<2, Eigen::Vector2d> {

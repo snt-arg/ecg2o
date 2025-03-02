@@ -73,12 +73,11 @@ class G2O_CORE_API SparseOptimizerAL : public SparseOptimizer{
   bool _ALTerminationFlag = false;
   int _max_num_inner_iterations = 1; // Maximum number of inner iterations for the AL algorithm
   double _rho_min = .5;  // Minimum value for the penalty parameter
-  double _rho_max = 5;  // Maximum value for the penalty parameter
+  double _rho_max = 50000;  // Maximum value for the penalty parameter
   double _init_rho = 1;
-  double _rho_upate_factor = 3;
+  double _rho_upate_factor = 10;
   double _init_eq_lagrange_multiplier = 0;
   std::vector<std::shared_ptr<g2o::OptimizableGraph::Vertex>> _vEqLagrangeMultiplier; // Set of Lagrangian vertices
-  double _vInitEqLagrangeMultiplier = 0.0; // Initial value for the Lagrangian verte
 
 
  public:
@@ -95,7 +94,7 @@ class G2O_CORE_API SparseOptimizerAL : public SparseOptimizer{
    template <int D, typename E, typename... VertexTypes>
    void constructQuadraticFormEq(BaseFixedSizedEdgeEq<D, E, VertexTypes...>& edge);
      
-  // solver parameter
+   // solver parameter
 
 
    // Setter function
@@ -119,8 +118,8 @@ class G2O_CORE_API SparseOptimizerAL : public SparseOptimizer{
 
    void setPenaltyParameter(double rho){ _init_rho = rho; };
    void setMaxNumInnerIterations(int numIterations) { _max_num_inner_iterations = numIterations; }
-   void setVLagrangianInitial(double vInitial) {_vInitEqLagrangeMultiplier = vInitial; }
-   void resetVLagrangianInitial(){ 
+   void setVLagrangianInitial(double vInitial) {_init_eq_lagrange_multiplier = vInitial; }
+   void resetVLagrangian(){ 
     for (auto& vertex : _vEqLagrangeMultiplier) {
       std::cout << "Resetting the Lagrangian vertex to the initial value" << std::endl;
        vertex->setToOrigin();    
@@ -149,7 +148,7 @@ class G2O_CORE_API SparseOptimizerAL : public SparseOptimizer{
       bool innerLoopStop = false;
       bool outerLoopStop = false;
       bool ok = true;
-      resetVLagrangianInitial();
+      resetVLagrangian();
     
     
       ok = _algorithm->init(online);

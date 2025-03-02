@@ -48,10 +48,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 #include <iostream>
 
 
-#include "sparse_optimizer_eq.h" // for utilizing the factor graph solver
-#include "sparse_optimizer_al.h" // using the AL solver
+#include "ecg2o/sparse_optimizer_eq.h" // for utilizing the factor graph solver
+#include "ecg2o/sparse_optimizer_al.h" // using the AL solver
  
-#include "example_vertices_edges.h" // for defining the edges
+#include "include/example_vertices_edges.h" // for defining the edges
+
+ 
+ 
 
 
     // Unary EdgeZ representing a single constraint
