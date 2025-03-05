@@ -142,7 +142,7 @@ class G2O_CORE_API SparseOptimizerEq : public SparseOptimizer{
     const double* update = algorithm->solver().x();
     size_t xSize = algorithm->solver().vectorSize();
     Eigen::Map<const Eigen::VectorXd> updateVec(update, xSize);
-    auto epsilon = epsilon_stop_threshold;     
+    auto epsilon = epsilon_stop_threshold;
     return updateVec.norm() < epsilon;
   }
 

@@ -36,6 +36,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
                       xy(1) + xy(2)    == 2.5,
 %  Note that x = xy(0) and y = xy(1)               
 % The answer is x = 15, y = -12.5, z = 15.5
+
+OP: min ||xy(1)-a||^2 +  ||xy(2)-b||^2 + ||z-c||^2 s.t.    xy(2) + z == 3, xy(1) + xy(2) == 2.5
 */
 
 
@@ -92,8 +94,7 @@ int main(int argc, char** argv) {
     
     argCount++;
     int zStart = (argc > argCount) ? std::atoi(argv[argCount]) : 10;
-    
-  
+   
     // [0] max_num_inner_iterations, [1] rho_min, [2] rho_max, [3] init_rho, [4] rho_upate_factor, [5] init_eq_lagrange_multiplier
     std::vector<double> settings = {1, 0.5, 5, 1, 1.4, 0};
     

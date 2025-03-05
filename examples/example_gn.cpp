@@ -28,6 +28,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 */
 
 
+
 /*
      minimize     (xy(1)-2)^2 +  (xy(2)-9)^2 + (z-50)^2
      subject to
@@ -35,7 +36,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
                       xy(1) + xy(2)    == 2.5,
 %  Note that x = xy(0) and y = xy(1)               
 % The answer is x = 15, y = -12.5, z = 15.5
+
+OP: min ||xy(1)-a||^2 +  ||xy(2)-b||^2 + ||z-c||^2 s.t.    xy(2) + z == 3, xy(1) + xy(2) == 2.5
 */
+
 
 
 #include <g2o/core/block_solver.h>

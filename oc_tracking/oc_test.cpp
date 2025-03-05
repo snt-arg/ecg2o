@@ -1,3 +1,45 @@
+/*
+Copyright (c) 2023, University of Luxembourg
+All rights reserved.
+
+Redistributions and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS'
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+*/
+
+
+
+/*
+     minimize     ||x_N + r_N ||^2_P + sum{k=1 .. N-1}(||x_k + r_k ||^2_Q +||u_k||^2_R)
+     subject to     x_{k+1} - (x_k + delta_t/m(u_k -F_{resist})) = 0 , k= 0.. N-1
+                       
+
+    ||e||^2_X= e'Xe 
+*/
+
+
+
+
 #include "oc_parameters.h"
 #include "oc_formulation.h"
 #include <Eigen/src/Core/products/Parallelizer.h>
@@ -31,11 +73,9 @@ int main(int argc, char** argv) {
     int argCount = 1;
     int Horizon = (argc > argCount) ? std::atoi(argv[argCount]) : 385; //  horizon length
     argCount++;
-    int numofRuns = (argc > argCount) ? std::atoi(argv[argCount]) : 1; // v_lagrange_initial
+    int numofRuns = (argc > argCount) ? std::atoi(argv[argCount]) : 1; 
     argCount++;
-    int numberOfIterations = (argc > argCount) ? std::atoi(argv[argCount]) : 500;
-    argCount++;
-    int linearSolverType = (argc > argCount) ? std::atoi(argv[argCount]) :13;
+    int numberOfIterations = (argc > argCount) ? std::atoi(argv[argCount]) : 50;
     argCount++;
     int solverType = (argc > argCount) ? std::atoi(argv[argCount]) :0;
 
@@ -66,30 +106,32 @@ int main(int argc, char** argv) {
     auto param = std::make_shared<g2o::oc::OCParameters>();
 
 //---------------------------------------------------------------------------------------------
-  #define USE_Eq
+
+#define USE_Eq
     // Initialize optimizer
      #ifdef USE_Eq
     auto optimizer = std::make_shared<g2o::SparseOptimizerEq>();
     auto oc = std::make_shared<g2o::oc::OCFormulation<g2o::SparseOptimizerEq>>(Horizon, optimizer, param);
     #else
-    auto optimizer = std::make_shared<g2o::SparseOptimizerAL>();
+    auto optimizer = std::make_shared<g2o::SparseOptimizerAL>();      
     auto oc = std::make_shared<g2o::oc::OCFormulation<g2o::SparseOptimizerAL>>(Horizon, optimizer, param);
+    std::vector<double> settings = {1, 0.5, 50000, 1, 10, 1};     // [0] max_num_inner_iterations, [1] rho_min, [2] rho_max, [3] init_rho, [4] rho_upate_factor, [5] init_eq_lagrange_multiplier
+    optimizer->algSettings(settings);   
     #endif
     
+
+
     optimizer->setVerbose(true);
     optimizer->setAlgorithm(algorithm.get());
     optimizer->setVLagrangianInitial(0); // the initial value of the Lagrangian vertex
 
           
+    oc->setupOC();
  
     // Update parameters
     param->set_initial_v_h_0(0);
-    param->set_initial_d_h_0(10.2);
-    param->set_TracForce_Prev(111.0);
-    param->set_BrakeForce_Prev(222.0);
-    //std::vector<double> vp_prediction = {0.5, 1, 1.5, 1.7, 1.9, 2.1,2.2,2.3,2.4,2.5 ,2.6};
-    //param->set_vp_prediction(vp_prediction);
-   oc->setupOC();
+    param->set_initial_f(0);
+    param->set_linearDynamics(false);
 
     // Set the initial guess
     oc->setInitialGuess(true);
@@ -104,6 +146,7 @@ int main(int argc, char** argv) {
     auto start_time = std::chrono::high_resolution_clock::now();
     
     for (int i = 0; i < numofRuns; i++){
+          oc->setInitialGuess(true);
           optimizer->optimize(numberOfIterations);
     }
  
