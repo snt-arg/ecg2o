@@ -32,10 +32,7 @@ set(G2O_LIBRARIES
     g2o::stuff
     g2o::solver_cholmod
 )
-
-
-
-
+ 
 # Manually specify g2o include directories and libraries
 include_directories(${G2O_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)  
 link_directories(${G2O_LIBRARY_DIRS})
