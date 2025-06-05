@@ -124,7 +124,7 @@ To set up the environment without Docker, follow these steps:
 
 
 
-6. ** Usage
+6. **Usage
 
 Once the library is successfully built, you can execute the provided functions for equality-constrained optimization.
 
