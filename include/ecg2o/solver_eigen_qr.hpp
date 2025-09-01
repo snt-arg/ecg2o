@@ -27,7 +27,6 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 */
 
-
 #include "g2o/core/block_solver.h"
 #include "g2o/core/optimization_algorithm_dogleg.h"
 #include "g2o/core/optimization_algorithm_factory.h"
@@ -37,21 +36,22 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 #include "g2o/stuff/logger.h"
 #include "linear_solver_eigen_qr.h"
 
-
 using namespace std;
 namespace g2o {
 
 namespace {
 template <int p, int l, bool blockorder>
 std::unique_ptr<BlockSolverBase> AllocateSolverSparseQR() {
-  G2O_DEBUG("Using EigenQR poseDim {} landMarkDim {} blockordering {}", p, l, blockorder);
+  G2O_DEBUG("Using EigenQR poseDim {} landMarkDim {} blockordering {}", p, l,
+            blockorder);
   auto linearSolver = std::make_unique<
       LinearSolverEigenQR<typename BlockSolverPL<p, l>::PoseMatrixType>>();
   return std::make_unique<BlockSolverPL<p, l>>(std::move(linearSolver));
 }
-}  // namespace
+} // namespace
 
-static OptimizationAlgorithm* createSolverSparseQR(const std::string& fullSolverName) {
+static OptimizationAlgorithm *
+createSolverSparseQR(const std::string &fullSolverName) {
   static const std::map<std::string,
                         std::function<std::unique_ptr<BlockSolverBase>()>>
       solver_factories{
@@ -66,7 +66,8 @@ static OptimizationAlgorithm* createSolverSparseQR(const std::string& fullSolver
 
   string solverName = fullSolverName.substr(3);
   auto solverf = solver_factories.find(solverName);
-  if (solverf == solver_factories.end()) return nullptr;
+  if (solverf == solver_factories.end())
+    return nullptr;
 
   string methodName = fullSolverName.substr(0, 2);
 
@@ -81,11 +82,12 @@ static OptimizationAlgorithm* createSolverSparseQR(const std::string& fullSolver
   return nullptr;
 }
 
-class EigenSparseQR_SolverCreator : public AbstractOptimizationAlgorithmCreator {
- public:
-  explicit EigenSparseQR_SolverCreator(const OptimizationAlgorithmProperty& p)
+class EigenSparseQR_SolverCreator
+    : public AbstractOptimizationAlgorithmCreator {
+public:
+  explicit EigenSparseQR_SolverCreator(const OptimizationAlgorithmProperty &p)
       : AbstractOptimizationAlgorithmCreator(p) {}
-  virtual OptimizationAlgorithm* construct() {
+  virtual OptimizationAlgorithm *construct() {
     return createSolverSparseQR(property().name);
   }
 };
@@ -93,10 +95,17 @@ class EigenSparseQR_SolverCreator : public AbstractOptimizationAlgorithmCreator 
 G2O_REGISTER_OPTIMIZATION_LIBRARY(eigen_sparse_qr);
 
 // Register solvers (similar to the dense ones)
-G2O_REGISTER_OPTIMIZATION_ALGORITHM(gn_var_sparse_qr, new EigenSparseQR_SolverCreator(
-    OptimizationAlgorithmProperty("gn_var_sparse_qr", "Gauss-Newton: Sparse QR solver (variable blocksize)", "Eigen", false, Eigen::Dynamic, Eigen::Dynamic)));
-G2O_REGISTER_OPTIMIZATION_ALGORITHM(lm_var_sparse_qr, new EigenSparseQR_SolverCreator(
-    OptimizationAlgorithmProperty("lm_var_sparse_qr", "Levenberg: Sparse QR solver (variable blocksize)", "Eigen", false, Eigen::Dynamic, Eigen::Dynamic)));
+G2O_REGISTER_OPTIMIZATION_ALGORITHM(
+    gn_var_sparse_qr,
+    new EigenSparseQR_SolverCreator(OptimizationAlgorithmProperty(
+        "gn_var_sparse_qr",
+        "Gauss-Newton: Sparse QR solver (variable blocksize)", "Eigen", false,
+        Eigen::Dynamic, Eigen::Dynamic)));
+G2O_REGISTER_OPTIMIZATION_ALGORITHM(
+    lm_var_sparse_qr,
+    new EigenSparseQR_SolverCreator(OptimizationAlgorithmProperty(
+        "lm_var_sparse_qr", "Levenberg: Sparse QR solver (variable blocksize)",
+        "Eigen", false, Eigen::Dynamic, Eigen::Dynamic)));
 // Add other registrations as needed
 
-}  // namespace g2o
+} // namespace g2o

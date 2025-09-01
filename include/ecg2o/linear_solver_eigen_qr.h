@@ -27,8 +27,6 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 */
 
-
-
 #ifndef G2O_LINEAR_SOLVER_EIGEN_QR_H
 #define G2O_LINEAR_SOLVER_EIGEN_QR_H
 
@@ -36,11 +34,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 #include <Eigen/SparseQR>
 #include <Eigen/src/Core/util/Constants.h>
 #include <cassert>
- 
+
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/linear_solver.h"
 #include "g2o/core/marginal_covariance_cholesky.h"
- #include "g2o/stuff/logger.h"
+#include "g2o/stuff/logger.h"
 #include "g2o/stuff/timeutil.h"
 
 namespace g2o {
@@ -53,14 +51,14 @@ namespace g2o {
  */
 template <typename MatrixType>
 class LinearSolverEigenQR : public LinearSolverCCS<MatrixType> {
- public:
+public:
   typedef Eigen::SparseMatrix<double, Eigen::ColMajor> SparseMatrix;
   typedef Eigen::Triplet<double> Triplet;
 
   using sparseQRDecomposition =
-          Eigen::SparseQR<SparseMatrix, Eigen::COLAMDOrdering<int>>;
+      Eigen::SparseQR<SparseMatrix, Eigen::COLAMDOrdering<int>>;
 
- public:
+public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   LinearSolverEigenQR() : LinearSolverCCS<MatrixType>(), _init(true) {}
 
@@ -69,44 +67,46 @@ class LinearSolverEigenQR : public LinearSolverCCS<MatrixType> {
     return true;
   }
 
-  bool solve(const SparseBlockMatrix<MatrixType>& A, double* x, double* b) {
+  bool solve(const SparseBlockMatrix<MatrixType> &A, double *x, double *b) {
     double t;
     bool qrState = computeSparseQR(A, t);
-    if (!qrState) return false;
+    if (!qrState)
+      return false;
 
     // Solving the system
     Eigen::VectorXd::MapType xx(x, _sparseMatrix.cols());
     Eigen::VectorXd::ConstMapType bb(b, _sparseMatrix.cols());
-    
+
     xx = _sparseQR.solve(bb);
-    G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
+    G2OBatchStatistics *globalStats = G2OBatchStatistics::globalStats();
     if (globalStats) {
       globalStats->timeNumericDecomposition = get_monotonic_time() - t;
-      globalStats->choleskyNNZ =
-          _sparseQR.matrixR().nonZeros();
+      globalStats->choleskyNNZ = _sparseQR.matrixR().nonZeros();
     }
     return true;
   }
 
- protected:
+protected:
   bool _init;
   SparseMatrix _sparseMatrix;
   sparseQRDecomposition _sparseQR;
 
   // compute the QR factorization
-  bool computeSparseQR(const SparseBlockMatrix<MatrixType>& A, double& t) {
+  bool computeSparseQR(const SparseBlockMatrix<MatrixType> &A, double &t) {
     // perform some operations only once upon init
-    if (_init) _sparseMatrix.resize(A.rows(), A.cols());
+    if (_init)
+      _sparseMatrix.resize(A.rows(), A.cols());
     fillSparseMatrix(A, !_init);
-    if (_init) computeSymbolicDecomposition();
+    if (_init)
+      computeSymbolicDecomposition();
     _init = false;
 
     t = get_monotonic_time();
     _sparseQR.factorize(_sparseMatrix.selfadjointView<Eigen::Upper>());
-    if (_sparseQR.info() != Eigen::Success) {  
+    if (_sparseQR.info() != Eigen::Success) {
       if (this->writeDebug()) {
-        G2O_ERROR(
-            "Sparse QR failure, writing debug.txt (Hessian loadable by Octave)");
+        G2O_ERROR("Sparse QR failure, writing debug.txt (Hessian loadable by "
+                  "Octave)");
         A.writeOctave("debug.txt");
       } else {
         G2O_DEBUG("QR failure");
@@ -125,15 +125,15 @@ class LinearSolverEigenQR : public LinearSolverCCS<MatrixType> {
   void computeSymbolicDecomposition() {
     double t = get_monotonic_time();
     _sparseQR.analyzePattern(_sparseMatrix.selfadjointView<Eigen::Upper>());
-    _init = false;  // Mark as initialized
-     
-    G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
-      if (globalStats)
-        globalStats->timeSymbolicDecomposition = get_monotonic_time() - t;
-    }
-  
+    _init = false; // Mark as initialized
 
-  void fillSparseMatrix(const SparseBlockMatrix<MatrixType>& A, bool onlyValues) {
+    G2OBatchStatistics *globalStats = G2OBatchStatistics::globalStats();
+    if (globalStats)
+      globalStats->timeSymbolicDecomposition = get_monotonic_time() - t;
+  }
+
+  void fillSparseMatrix(const SparseBlockMatrix<MatrixType> &A,
+                        bool onlyValues) {
     if (onlyValues) {
       this->_ccsMatrix->fillCCS(_sparseMatrix.valuePtr(), true);
       return;
@@ -153,25 +153,25 @@ class LinearSolverEigenQR : public LinearSolverCCS<MatrixType> {
    * computation.
    */
   bool solveBlocks_impl(
-      const SparseBlockMatrix<MatrixType>& A,
-      [[maybe_unused]] std::function<void(MarginalCovarianceCholesky&)> compute) {
+      const SparseBlockMatrix<MatrixType> &A,
+      [[maybe_unused]] std::function<void(MarginalCovarianceCholesky &)>
+          compute) {
     // compute the QR factor
     double t;
     bool sparseQRState = computeSparseQR(A, t);
-    if (!sparseQRState) return false;
+    if (!sparseQRState)
+      return false;
 
     // book keeping statistics
-    G2OBatchStatistics* globalStats = G2OBatchStatistics::globalStats();
+    G2OBatchStatistics *globalStats = G2OBatchStatistics::globalStats();
     if (globalStats) {
-      globalStats->choleskyNNZ =
-          _sparseQR.matrixR().nonZeros();
+      globalStats->choleskyNNZ = _sparseQR.matrixR().nonZeros();
     }
     return true;
   }
 };
 
-}  // namespace g2o
-
+} // namespace g2o
 
 #include "solver_eigen_qr.hpp"
 #endif
