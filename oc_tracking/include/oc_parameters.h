@@ -151,10 +151,10 @@ private:
     std::vector<double> get_eff_map() const { return eff_map; }
     double get_TracForce_Prev() const { return TracForce_Prev; }
     double get_BrakeForce_Prev() const { return BrakeForce_Prev; } 
-    double get_v_h_ref(int k) const { return v_h_ref[k]; }
-    double get_alpha_prediction(int k) const { return alpha_prediction[k]; }
-    double get_v_min_prediction(int k) const { return v_min_prediction[k]; }
-    double get_v_max_prediction(int k) const { return v_max_prediction[k]; }
+    double get_v_h_ref(int k) const { return v_h_ref.at(k); }
+    double get_alpha_prediction(int k) const { return alpha_prediction.at(k); }
+    double get_v_min_prediction(int k) const { return v_min_prediction.at(k); }
+    double get_v_max_prediction(int k) const { return v_max_prediction.at(k); }
     std::vector<double> get_v_h_ref() const { return v_h_ref; }
     std::vector<double> get_alpha_prediction() const { return alpha_prediction; }
     std::vector<double> get_v_min_prediction() const { return v_min_prediction; }
