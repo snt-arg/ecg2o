@@ -164,9 +164,13 @@ public:
     OptimizationAlgorithm::SolverResult result = OptimizationAlgorithm::OK;
 
     while (!outerLoopStop) {
+
       innerLoopStop = false;
-      int i = 0;
+
+      int i;
       while (!innerLoopStop) {
+        i = 0;
+        i++;
         preIteration(cjIterations);
 
         if (_computeBatchStatistics) {
@@ -206,18 +210,14 @@ public:
         postIteration(cjIterations);
 
         // termination criteria
-        i++;
-        innerLoopStop = i >= _max_num_inner_iterations ||
-                        cjIterations >= iterations || terminate() ||
-                        verifyTermination(-1 * 10) ||
-                        !ok; // -1 is the defualt and
-                             // here 10 time the defualt
+        innerLoopStop = i >= _max_num_inner_iterations || i >= iterations ||
+                        !ok || verifyTermination(); // -1 is the defualt and
+                                                    // here 10 time the defualt
       }
-      if (innerLoopStop) {
-        // update the multiplier for Equality constraints
-        for (auto &edge : _edgeEqSet) {
-          executeEqMultiplierUpdate(edge);
-        }
+
+      // update the multiplier for Equality constraints
+      for (auto &edge : _edgeEqSet) {
+        executeEqMultiplierUpdate(edge);
       }
 
       if (result == OptimizationAlgorithm::Fail) {
@@ -236,21 +236,18 @@ public:
     return cjIterations;
   }
 
-  bool verifyTermination(double epsilon = -1) {
-    epsilon = (epsilon < 0) ? std::abs(epsilon) * epsilon_stop_threshold
-                            : epsilon_stop_threshold;
+  bool verifyTermination() {
     OptimizationAlgorithmWithHessian *algorithm =
         static_cast<OptimizationAlgorithmWithHessian *>(_algorithm);
     const double *update = algorithm->solver().x();
     size_t xSize = algorithm->solver().vectorSize();
     Eigen::Map<const Eigen::VectorXd> updateVec(update, xSize);
+    auto epsilon = epsilon_stop_threshold;
     return updateVec.norm() < epsilon;
   }
 
-  bool verifyEqFeasibility(const std::set<OptimizableGraph::Edge *> &edgeSet,
-                           double epsilon = -1) {
-    epsilon = (epsilon < 0) ? std::abs(epsilon) * epsilon_stop_threshold
-                            : epsilon_eq_threshold;
+  bool verifyEqFeasibility(const std::set<OptimizableGraph::Edge *> &edgeSet) {
+    auto epsilon = epsilon_eq_threshold;
 
     for (auto &edge : edgeSet) {
       edge->computeError();
