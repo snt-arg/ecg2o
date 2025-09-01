@@ -58,6 +58,17 @@ target_link_libraries(example_soft ${G2O_LIBRARIES} Eigen3::Eigen  fmt::fmt)
 
 
 
+# add executable example_gtsam_gn
+add_executable(example_gtsam_gn examples/comparison_gtsam/example_gtsam_gn.cpp)
+target_link_libraries(example_gtsam_gn ${G2O_LIBRARIES} Eigen3::Eigen  fmt::fmt) 
+
+
+
+# add executable example_gtsam_al
+add_executable(example_gtsam_al examples/comparison_gtsam/example_gtsam_al.cpp)
+target_link_libraries(example_gtsam_al ${G2O_LIBRARIES} Eigen3::Eigen  fmt::fmt) 
+
+
 
 # add executable oc_test
 add_executable(oc_test oc_tracking/oc_test.cpp)
