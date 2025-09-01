@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
   int linearSolverType = (argc > argCount) ? std::atoi(argv[argCount]) : 0;
 
   argCount++;
-  int numberOfIterations = (argc > argCount) ? std::atoi(argv[argCount]) : 2;
+  int numberOfIterations = (argc > argCount) ? std::atoi(argv[argCount]) : 150;
 
   std::vector<double> settings = {10, 11, 5e5, 11, 20, 0};
   argCount++;
