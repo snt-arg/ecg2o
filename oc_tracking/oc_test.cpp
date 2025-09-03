@@ -70,9 +70,8 @@ int main(int argc, char **argv) {
   int numberOfIterations = (argc > argCount) ? std::atoi(argv[argCount]) : 50;
   argCount++;
   int solverType = (argc > argCount) ? std::atoi(argv[argCount]) : 0;
-    argCount++;
+  argCount++;
   int linearSolverType = (argc > argCount) ? std::atoi(argv[argCount]) : 0;
-
 
   std::unique_ptr<g2o::BlockSolverX> blockSolver;
   std::unique_ptr<g2o::LinearSolver<g2o::BlockSolverX::PoseMatrixType>>
@@ -120,9 +119,8 @@ int main(int argc, char **argv) {
   auto param = std::make_shared<g2o::oc::OCParameters>();
 
   //---------------------------------------------------------------------------------------------
-
 #define USE_Eq
-  // Initialize optimizer
+//  Initialize optimizer
 #ifdef USE_Eq
   auto optimizer = std::make_shared<g2o::SparseOptimizerEq>();
   auto oc = std::make_shared<g2o::oc::OCFormulation<g2o::SparseOptimizerEq>>(
@@ -132,9 +130,10 @@ int main(int argc, char **argv) {
   auto oc = std::make_shared<g2o::oc::OCFormulation<g2o::SparseOptimizerAL>>(
       Horizon, optimizer, param);
   std::vector<double> settings = {
-      1,  0.5, 50000, 1,
-      10, 1}; // [0] max_num_inner_iterations, [1] rho_min, [2] rho_max, [3]
-              // init_rho, [4] rho_upate_factor, [5] init_eq_lagrange_multiplier
+      1, 0.5, 50000,
+      1, 5,   1}; // [0] max_num_inner_iterations, [1] rho_min, [2] rho_max, [3]
+                  // init_rho, [4] rho_upate_factor, [5]
+                  // init_eq_lagrange_multiplier
   optimizer->algSettings(settings);
 #endif
 
@@ -172,7 +171,13 @@ int main(int argc, char **argv) {
   std::chrono::duration<double> elapsed_seconds = end_time - start_time;
 
   // Retrieve and print results
-  std::vector<double> results = oc->getResults();
+  std::string filename;
+#ifdef USE_Eq
+  filename = "output_gn.txt";
+#else
+  filename = "output_al.txt";
+#endif
+  std::vector<double> results = oc->getResults(filename);
   double u_input = oc->getForceInput(0);
 
   // std::cout << "Optimization done.\nResults:\n"

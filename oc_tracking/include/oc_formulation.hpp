@@ -131,7 +131,7 @@ double OCFormulation<Optimizer>::getVertexScalarEstimate(int id) {
 
 // get the results
 template <typename Optimizer>
-std::vector<double> OCFormulation<Optimizer>::getResults() {
+std::vector<double> OCFormulation<Optimizer>::getResults(std::string filename) {
     _results.clear();
     for (int k = 0; k <= _N; k++) {
         _results.push_back(getVertexScalarEstimate(_offset_v_h + k));
@@ -151,7 +151,7 @@ std::vector<double> OCFormulation<Optimizer>::getResults() {
     }
 
 
-    std::ofstream outFile("output.txt"); // Open file for writing
+    std::ofstream outFile(filename); // Open file for writing
 
     if (outFile.is_open()) {
         outFile << "[ "; // Start with an opening bracket

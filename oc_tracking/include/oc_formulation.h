@@ -50,7 +50,7 @@ public:
     void addVertices(int k);
     void setVertexScalarEstimate(int id, double value);
     double getVertexScalarEstimate(int id);
-    std::vector<double> getResults();
+    std::vector<double> getResults(std::string filename ="output.txt");
     double getForceInput(int k);
 
     // Add edges
