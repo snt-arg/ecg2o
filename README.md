@@ -8,7 +8,6 @@ The library also includes an **Augmented Lagrangian implementation** as a benchm
 ### Reference
 
 > *ecg2o: A Seamless Extension of g2o for Equality-Constrained Factor Graph Optimization*  
-> Submitted to IEEE IROS.
 
 ---
 
