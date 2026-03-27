@@ -339,6 +339,8 @@ void SparseOptimizerAL::updateMultipliers(EdgeType &edge) {
 
   for (int i = 0; i < D; ++i) {
     double x_d = 0, x_i = 0;
+    // update mulitplier
+    multiplier[i] = multiplier[i] + 2 * rho[i] * error[i];
 
     switch (2) {
     case 1:
@@ -363,9 +365,6 @@ void SparseOptimizerAL::updateMultipliers(EdgeType &edge) {
         rho[i] = _rho_max;
       break;
     }
-
-    // update mulitplier
-    multiplier[i] = multiplier[i] + 2 * rho[i] * error[i];
   }
 
   edge.setLagrangeMultiplier(multiplier);
