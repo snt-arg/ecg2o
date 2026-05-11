@@ -217,6 +217,10 @@ public:
         // update the multiplier for Equality constraints
         for (auto &edge : _edgeEqSet) {
           executeEqMultiplierUpdate(edge);
+          // pritn the number of inner iterations
+        }
+        if (verbose()) {
+          std::cout << "Inner iterations: " << i << std::endl;
         }
       }
 
@@ -343,6 +347,9 @@ void SparseOptimizerAL::updateMultipliers(EdgeType &edge) {
   for (int i = 0; i < D; ++i) {
     double x_d = 0, x_i = 0;
 
+    // update mulitplier
+    multiplier[i] = multiplier[i] + 2 * rho[i] * error[i];
+
     switch (2) {
     case 1:
       constraints_violation = constraints_violation.cwiseAbs();
@@ -366,9 +373,6 @@ void SparseOptimizerAL::updateMultipliers(EdgeType &edge) {
         rho[i] = _rho_max;
       break;
     }
-
-    // update mulitplier
-    multiplier[i] = multiplier[i] + 2 * rho[i] * error[i];
   }
 
   edge.setLagrangeMultiplier(multiplier);
